@@ -1,0 +1,25 @@
+This is a simple script to notify your twitter's friends timeline.
+I have no plan to add support to post twitts or anything like that.
+
+Installation guide:
+
+- Download the pytwify to any location on your pc. Let's suppose you download it to your home folder: "/home/USERNAME/pytwify/"
+
+- Create a file named ".pytwify.cfg" on your home folder with the following content:
+
+[auth]
+username = YOUR_TWITTER_USERNAME
+password = YOUR_TWITTER_PASSWORD
+
+[vars]
+lastid = 0
+
+- Create some kind of auto start for the script
+
+- - I personaly use Ubuntu, so i have the "System / Preferences / Startup Programs" to do it, it runs the following command:
+python /home/USERNAME/pytwify/pytwify.py
+
+- - You can also use the ".profile" file on your home folder to start the pytwify, it's a script that runs when you log. If you want to use it, just append the following command in the ".profile" file:
+python /home/USERNAME/pytwify/pytwify.py &
+
+- Try to log out and in again. It should be working now =]
