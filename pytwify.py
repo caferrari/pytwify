@@ -1,4 +1,5 @@
 import pynotify, twitter, os.path, os, sys
+import urllib2
 from time import sleep
 
 import ConfigParser
@@ -7,63 +8,68 @@ config = ConfigParser.ConfigParser()
 
 if pynotify.init("Twitter"):
 
-	firstRun = True
 	configFile = os.getenv("HOME")+'/.pytwify.cfg'
+	cachePath = '/tmp/pytwify/'
+	lastIdFile = cachePath + "last"
+	lastId = 0
 	
 	while True:
 
-			try:
-				
-				config.read(configFile)			
-				username = config.get('auth', 'username')
-				password = config.get('auth', 'password')
-				lastId = config.getint('vars', 'lastId')
-		
-				api = twitter.Api(username, password)
+		config.read(configFile)			
+		username = config.get('auth', 'username')
+		password = config.get('auth', 'password')
 
-				if firstRun:
-							
-					try:
-						twitts = api.GetFriendsTimeline(count = 1)
-						firstRun = False
-						if len(twitts) > 0:
-							lastId = twitts[0].id
-				
-					except:
-						print "auth error =("
-						pynotify.Notification("PyTwiFy: Error ", "Couldn't authenticate.\n Edit the file "+configFile).show()
-									
-				else:
+		api = twitter.Api(username, password)
 
-					try:
-
-						print "lastId is: " + str(lastId)
-				
-						twitts = api.GetFriendsTimeline(since_id = lastId)
-
-						print "twitt(s) retrieved: " + str(len(twitts))
-		
-						if len(twitts) > 0:
-							lastId = twitts[0].id
-
-							for i in range(len(twitts)-1, -1, -1):
-								t = twitts[i]
-								print "showing twitt from " + t.user.screen_name + " (id:" + str(t.id) + ")"
-								pynotify.Notification("Pytter: " + t.user.screen_name, t.text).show()
-				
-					except:
-						print "some error =("
-						pynotify.Notification("PyTwiFy: Error ", "Some connection error ocurred...").show()
+		if not os.path.exists(lastIdFile):
+			if not os.path.exists(cachePath):
+				os.mkdir(cachePath)
 					
-				config.set("vars","lastId",lastId)
-				config.write(open(configFile,'wb'))
-		
-				print "next lastId is: " + str(lastId)
-				print "sleeping..."
+			try:		
+				twitts = api.GetFriendsTimeline(count = 1)
+				if len(twitts) > 0:
+					lastId = twitts[0].id
 				
 			except:
-				pynotify.Notification("PyTwiFy: Error ", "Error while reading the configuration.\n Please setup the file "+configFile).show()
-
-			sleep(60)
+				print "auth error =("
+				pynotify.Notification("PyTwiFy: Error ", "Couldn't authenticate.\n Edit the file "+configFile).show()
+			
+			open(lastIdFile,"wb").write(str(lastId))
+									
+		else:
 		
+			lastId = open(lastIdFile).read()
+
+			try:
+
+				print "lastId is: " + str(lastId)
+	
+				twitts = api.GetFriendsTimeline(since_id = lastId)
+
+				print "twitt(s) retrieved: " + str(len(twitts))
+
+				if len(twitts) > 0:
+					lastId = twitts[0].id
+
+					for i in range(len(twitts)-1, -1, -1):
+						t = twitts[i]
+						print "showing twitt from " + t.user.screen_name + " (id:" + str(t.id) + ")"
+					
+						uri = cachePath + "image_" + t.user.screen_name 
+						if not os.path.exists(uri):
+							open(uri,"w").write(urllib2.urlopen(t.user.profile_image_url).read())
+					
+						n = pynotify.Notification("PyTwiFy: " + t.user.screen_name, t.text, uri)
+						n.show()
+					
+					open(lastIdFile,"wb").write(str(lastId))
+						
+			except:
+				print "some error =("
+				pynotify.Notification("PyTwiFy: Error ", "Twitter is baleiando").show()
+						
+		print "next lastId is: " + str(lastId)
+		print "sleeping..."
+
+		sleep(60)
 		

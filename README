@@ -14,9 +14,6 @@ sudo aptitude install python-twitter
 username = YOUR_TWITTER_USERNAME
 password = YOUR_TWITTER_PASSWORD
 
-[vars]
-lastid = 0
-
 - Create some kind of auto start for the script
 
 - - I personaly use Ubuntu, so i have the "System / Preferences / Startup Programs" to do it, it runs the following command:
