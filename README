@@ -3,6 +3,9 @@ I have no plan to add support to post twitts or anything like that.
 
 Installation guide:
 
+- First, install the python-twitter package. For Ubuntu just run the following command:
+sudo aptitude install python-twitter
+
 - Download the pytwify to any location on your pc. Let's suppose you download it to your home folder: "/home/USERNAME/pytwify/"
 
 - Create a file named ".pytwify.cfg" on your home folder with the following content:
