@@ -10,7 +10,6 @@ if pynotify.init("Twitter"):
 
 	configFile = os.getenv("HOME")+'/.pytwify.cfg'
 	cachePath = '/tmp/pytwify/'
-	lastIdFile = cachePath + "last"
 	lastId = 0
 	
 	while True:
@@ -18,6 +17,8 @@ if pynotify.init("Twitter"):
 		config.read(configFile)			
 		username = config.get('auth', 'username')
 		password = config.get('auth', 'password')
+		
+		lastIdFile = cachePath + username+".last"
 
 		api = twitter.Api(username, password)
 
@@ -29,17 +30,17 @@ if pynotify.init("Twitter"):
 				twitts = api.GetFriendsTimeline(count = 1)
 				if len(twitts) > 0:
 					lastId = twitts[0].id
+					if lastId != 0:
+						open(lastIdFile,"wb").write(str(lastId))
 				
 			except:
 				print "auth error =("
 				pynotify.Notification("PyTwiFy: Error ", "Couldn't authenticate.\n Edit the file "+configFile).show()
-			
-			open(lastIdFile,"wb").write(str(lastId))
 									
 		else:
 		
 			lastId = open(lastIdFile).read()
-
+	
 			try:
 
 				print "lastId is: " + str(lastId)
@@ -66,7 +67,7 @@ if pynotify.init("Twitter"):
 						
 			except:
 				print "some error =("
-				pynotify.Notification("PyTwiFy: Error ", "Twitter is baleiando").show()
+				pynotify.Notification("PyTwiFy: Error ", "Twitter is \"baleiando\".").show()
 						
 		print "next lastId is: " + str(lastId)
 		print "sleeping..."
