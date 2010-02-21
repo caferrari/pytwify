@@ -40,13 +40,7 @@ class pytwify:
 		self.username = 'not-set'
 		self.password = 'not-set'
 		self.lastId = 0
-	
-		try:
-			from win32com.shell import shellcon, shell
-			self.homedir = shell.SHGetFolderPath(0, shellcon.CSIDL_APPDATA, 0, 0)
-		except ImportError:
-			self.homedir = os.path.expanduser("~")
-		
+		self.homedir = os.path.expanduser("~")
 		self.configFile = self.homedir + '/.pytwify/config.cfg'
 		self.cachePath =  self.homedir + '/.pytwify/cache/'
 		self.readConf()
