@@ -1,6 +1,6 @@
 #!/usr/bin/python2.6
 # -*- coding: utf-8 -*-#
-import pynotify, twitter, os.path, os, sys, urllib2, tempfile
+import pynotify, twitter, os.path, os, sys, urllib2, tempfile, commands
 from time import sleep
 from ConfigParser import ConfigParser
 
@@ -49,22 +49,27 @@ class pytwify:
 		self.showtime()
 		
 	def showtime(self):
-		try:
-			twitts = self.twitter.GetFriendsTimeline(since_id = int(self.lastId))
-			self.log ('%d new tweets found' % len(twitts))
-			if (twitts):
-				self.lastId = twitts[0].id
-	 			self.saveConf()
-			while twitts:
-				t = twitts.pop()
-				uri = '%s/image_%s' % (self.cachePath, t.user.screen_name)
-				os.path.isfile(uri) or open(uri, 'w').write(urllib2.urlopen(t.user.profile_image_url).read())
-				pynotify.Notification('PyTwiFy: %s ' % t.user.screen_name, t.text, uri).show()
-		except:
-			self.log('Some error trying to retrive the tweets')
+		if commands.getoutput('purple-remote getstatus') == 'away':
+			self.log ('Hello? are you there?..')
+			sleep(10)
+		else:
+			try:
+				twitts = self.twitter.GetFriendsTimeline(since_id = int(self.lastId))
+				self.log ('%d new tweets found' % len(twitts))
+				if (twitts):
+					self.lastId = twitts[0].id
+		 			self.saveConf()
+				while twitts:
+					t = twitts.pop()
+					uri = '%s/image_%s' % (self.cachePath, t.user.screen_name)
+					os.path.isfile(uri) or open(uri, 'w').write(urllib2.urlopen(t.user.profile_image_url).read())
+					pynotify.Notification('PyTwiFy: %s ' % t.user.screen_name, t.text, uri).show()
+			except:
+				self.log('Some error trying to retrive the tweets')
 			
-		self.log ('sleeping...')
-		sleep(60)
+			self.log ('sleeping...')
+			sleep(60)
+			
 		self.showtime()
 		
 pytwify()
